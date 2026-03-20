@@ -2,6 +2,7 @@ import pygame
 import json
 import os
 import math
+import re
 import time
 
 # --- Configuración de Constantes ---
@@ -22,12 +23,14 @@ PX_TO_MM = 25.4 / 96  # ≈ 0.2646 mm/píxel
 class BBTGame:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()  # Inicializar el mixer de audio
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Digital Box and Block Test - Evaluación Post-ACV")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("Helvetica", 18)
         self.font_large = pygame.font.SysFont("Helvetica", 36, bold=True)
         self.font_medium = pygame.font.SysFont("Helvetica", 28)
+        self.font_small = pygame.font.SysFont("Helvetica", 20)
         
         # Áreas de juego
         self.box_left = pygame.Rect(50, 150, 350, 300)
@@ -36,7 +39,63 @@ class BBTGame:
         
         self.patient_name = ""
         self.trial_mode = None  # "training" o "test"
+        self.sound_enabled = True  # Control de sonidos
+        self.current_test_number = None  # Número de prueba para el test actual
+        self.create_sounds()  # Crear sonidos
         self.reset_session()
+
+    def create_sounds(self):
+        """Crea sonidos programáticamente para efectos de audio"""
+        # Sonido de golpe/colisión (tono bajo y corto)
+        self.error_sound = self.generate_descending_tone(400, 200, 0.25, 0.3)  # 400Hz a 200Hz, 250ms
+
+        # Sonido de éxito (tono alto y agradable)
+        self.success_sound = self.generate_tone(400, 0.2, 0.4)  # 400Hz, 200ms, volumen 0.4
+
+        # Sonido de error/caída (tono descendente)
+        self.collision_sound = self.generate_tone(200, 0.15, 0.3)  # 200Hz, 150ms, volumen 0.3
+        
+        # Sonido de selección (tono suave)
+        self.select_sound = self.generate_tone(300, 0.1, 0.2)  # 300Hz, 100ms, volumen 0.2
+
+    def generate_tone(self, frequency, duration, volume=0.5):
+        """Genera un tono simple"""
+        sample_rate = 44100
+        num_samples = int(sample_rate * duration)
+
+        # Crear onda sinusoidal
+        buffer = []
+        for i in range(num_samples):
+            sample = int(volume * 32767 * math.sin(2 * math.pi * frequency * i / sample_rate))
+            buffer.append(sample)
+
+        # Convertir a bytes
+        sound_bytes = b''
+        for sample in buffer:
+            sound_bytes += sample.to_bytes(2, byteorder='little', signed=True)
+
+        # Crear objeto Sound
+        sound = pygame.mixer.Sound(buffer=bytes(sound_bytes))
+        return sound
+
+    def generate_descending_tone(self, start_freq, end_freq, duration, volume=0.5):
+        """Genera un tono descendente"""
+        sample_rate = 44100
+        num_samples = int(sample_rate * duration)
+
+        buffer = []
+        for i in range(num_samples):
+            # Frecuencia descendente lineal
+            freq = start_freq + (end_freq - start_freq) * (i / num_samples)
+            sample = int(volume * 32767 * math.sin(2 * math.pi * freq * i / sample_rate))
+            buffer.append(sample)
+
+        sound_bytes = b''
+        for sample in buffer:
+            sound_bytes += sample.to_bytes(2, byteorder='little', signed=True)
+
+        sound = pygame.mixer.Sound(buffer=bytes(sound_bytes))
+        return sound
 
     def reset_session(self):
         self.blocks = []
@@ -72,6 +131,27 @@ class BBTGame:
         self.start_time = time.time()
         self.espasmo_inicio = None
         self.prev_movement_time = time.time()
+
+    def calculate_next_test_number(self):
+        """Calcula el próximo número de prueba para el paciente actual"""
+        if not os.path.exists('results'):
+            os.makedirs('results')
+        
+        patient_id = self.patient_name.strip().replace(" ", "_")
+        if not patient_id:
+            patient_id = "Paciente"
+        patient_id = "".join(ch for ch in patient_id if ch.isalnum() or ch in ("_", "-"))
+        
+        # Buscar todos los archivos del paciente para determinar el próximo número
+        existing = [f for f in os.listdir("results") if f.startswith(patient_id + "_") and f.endswith(".json")]
+        max_prueba = 0
+        for fname in existing:
+            m = re.match(rf"^{re.escape(patient_id)}_.*_prueba(\d+)\.json$", fname)
+            if m:
+                num = int(m.group(1))
+                max_prueba = max(max_prueba, num)
+        
+        self.current_test_number = max_prueba + 1
 
     def calculate_kinematics(self, current_pos):
         current_time = time.time()
@@ -209,7 +289,19 @@ class BBTGame:
             "timestamp": time.ctime()
         }
         
-        filename = f"results/session_{self.patient_name}_{phase_name}_{int(time.time())}.json"
+        # Generar nombre de archivo basado en el paciente, fase y número de prueba
+        patient_id = self.patient_name.strip().replace(" ", "_")
+        if not patient_id:
+            patient_id = "Paciente"
+        patient_id = "".join(ch for ch in patient_id if ch.isalnum() or ch in ("_", "-"))
+
+        phase_id = str(phase_name).strip().replace(" ", "_")
+        if not phase_id:
+            phase_id = "Fase"
+        phase_id = "".join(ch for ch in phase_id if ch.isalnum() or ch in ("_", "-"))
+
+        filename = os.path.join("results", f"{patient_id}_{phase_id}_prueba{self.current_test_number}.json")
+
         with open(filename, 'w') as f:
             json.dump(final_data, f, indent=4)
         print(f"Resultados guardados en {filename}")
@@ -236,23 +328,32 @@ class BBTGame:
             input_surface = self.font.render(input_text, True, BLACK)
             self.screen.blit(input_surface, (110, 215))
             
-            options_label = self.font_medium.render("Selecciona una opción:", True, BLACK)
-            self.screen.blit(options_label, (100, 300))
+            # Checkbox para sonidos
+            sound_label = self.font.render("Sonidos activados:", True, BLACK)
+            self.screen.blit(sound_label, (100, 280))
             
-            btn_training = pygame.Rect(100, 360, 300, 60)
+            sound_checkbox = pygame.Rect(250, 275, 30, 30)
+            pygame.draw.rect(self.screen, BLACK, sound_checkbox, 2)
+            if self.sound_enabled:
+                pygame.draw.rect(self.screen, GREEN, pygame.Rect(255, 280, 20, 20))
+            
+            options_label = self.font_medium.render("Selecciona una opción:", True, BLACK)
+            self.screen.blit(options_label, (100, 330))
+            
+            btn_training = pygame.Rect(100, 390, 300, 60)
             color_training = BLUE if selected_option == 0 else GRAY
             pygame.draw.rect(self.screen, color_training, btn_training)
             training_text = self.font.render("ENTRENAMIENTO", True, WHITE)
             self.screen.blit(training_text, (btn_training.x + 50, btn_training.y + 20))
             
-            btn_test = pygame.Rect(500, 360, 300, 60)
+            btn_test = pygame.Rect(500, 390, 300, 60)
             color_test = BLUE if selected_option == 1 else GRAY
             pygame.draw.rect(self.screen, color_test, btn_test)
             test_text = self.font.render("PRUEBA FORMAL", True, WHITE)
             self.screen.blit(test_text, (btn_test.x + 50, btn_test.y + 20))
             
             instruction = self.font.render("Haz clic en una opción o presiona ENTER", True, BLACK)
-            self.screen.blit(instruction, (WIDTH//2 - instruction.get_width()//2, 500))
+            self.screen.blit(instruction, (WIDTH//2 - instruction.get_width()//2, 480))
             
             pygame.display.flip()
             
@@ -282,6 +383,8 @@ class BBTGame:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if input_box.collidepoint(event.pos):
                         input_active = True
+                    elif sound_checkbox.collidepoint(event.pos):
+                        self.sound_enabled = not self.sound_enabled
                     elif btn_training.collidepoint(event.pos):
                         selected_option = 0
                         self.patient_name = input_text if input_text else "Paciente"
@@ -338,7 +441,7 @@ class BBTGame:
             msg_surface = self.font_large.render("¡PRUEBA FINALIZADA!", True, WHITE)
             self.screen.blit(msg_surface, (WIDTH//2 - msg_surface.get_width()//2, HEIGHT//2 - 80))
             
-            stats_text = self.font.render(f"Paciente: {self.patient_name}", True, WHITE)
+            stats_text = self.font_small.render(f"Paciente: {self.patient_name}", True, WHITE)
             self.screen.blit(stats_text, (WIDTH//2 - stats_text.get_width()//2, HEIGHT//2 + 20))
             
             instruction = self.font.render("Presiona cualquier tecla para salir", True, WHITE)
@@ -381,15 +484,21 @@ class BBTGame:
                     for b in self.blocks:
                         if b['rect'].collidepoint(event.pos):
                             self.selected_block = b
+                            if self.sound_enabled:
+                                self.select_sound.play()  # 🔊 Sonido de selección
                             break
                             
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     if self.selected_block:
                         if self.box_right.colliderect(self.selected_block['rect']):
                             self.metrics["exitos"] += 1
+                            if self.sound_enabled:
+                                self.success_sound.play()  # 🔊 Sonido de éxito
                             self.blocks.remove(self.selected_block)
                         else:
                             self.metrics["caidas_mouse"] += 1
+                            if self.sound_enabled:
+                                self.collision_sound.play()  # 🔊 Sonido de golpe (fuera de área)
                             self.selected_block['rect'].topleft = self.selected_block['original_pos']
                         self.selected_block = None
 
@@ -400,6 +509,8 @@ class BBTGame:
                 
                 if self.selected_block['rect'].colliderect(self.partition):
                     self.metrics["errores_pared"] += 1
+                    if self.sound_enabled:
+                        self.error_sound.play()  # 🔊 Sonido de error/caída contra la línea central
                     self.selected_block['rect'].topleft = self.selected_block['original_pos']
                     self.selected_block = None
             else:
@@ -439,7 +550,8 @@ if __name__ == "__main__":
         exit()
     
     if game.trial_mode == "training":
-        # Modo Entrenamiento
+        # Modo Entrenamiento - Calcular número de prueba
+        game.calculate_next_test_number()
         game.run_trial(900, "Entrenamiento")
         
         # Después del entrenamiento, realizar la prueba formal
@@ -448,11 +560,14 @@ if __name__ == "__main__":
             exit()
     
     # Modo Prueba Formal (dos fases) - Se ejecuta después del entrenamiento o directamente si se selecciona prueba
-    # Fase 1: Mano Derecha
-    game.run_trial(60, "Mano_Derecha")
+    # Calcular el número de prueba una sola vez para que ambas fases compartan el mismo número
+    game.calculate_next_test_number()
+    
+    # Fase 1: Lado Izquierdo
+    game.run_trial(60, "Lado Izquierdo")
     
     # Notificación de transición
-    if not game.show_transition_notification("Cambiando a Mano Izquierda", duration=2):
+    if not game.show_transition_notification("Cambiando a Lado Derecho", duration=2):
         pygame.quit()
         exit()
     
@@ -475,7 +590,8 @@ if __name__ == "__main__":
     
     # Invertir cajas para la segunda vuelta
     game.box_left, game.box_right = game.box_right, game.box_left
-    game.run_trial(60, "Mano_Izquierda")
+    #Fase 2: Lado Derecho
+    game.run_trial(60, "Lado Derecho")
     
     # Mostrar pantalla final
     game.show_final_notification()
