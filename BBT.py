@@ -341,13 +341,13 @@ class BBTGame:
             self.screen.blit(options_label, (100, 330))
             
             btn_training = pygame.Rect(100, 390, 300, 60)
-            color_training = BLUE if selected_option == 0 else GRAY
+            color_training = GRAY if selected_option == 0 else BLUE
             pygame.draw.rect(self.screen, color_training, btn_training)
             training_text = self.font.render("ENTRENAMIENTO", True, WHITE)
             self.screen.blit(training_text, (btn_training.x + 50, btn_training.y + 20))
             
             btn_test = pygame.Rect(500, 390, 300, 60)
-            color_test = BLUE if selected_option == 1 else GRAY
+            color_test = GRAY if selected_option == 1 else BLUE
             pygame.draw.rect(self.screen, color_test, btn_test)
             test_text = self.font.render("PRUEBA FORMAL", True, WHITE)
             self.screen.blit(test_text, (btn_test.x + 50, btn_test.y + 20))
@@ -538,7 +538,7 @@ class BBTGame:
             pygame.display.flip()
             self.clock.tick(FPS)
             
-        self.save_results(phase_name)
+        # self.save_results(phase_name)  # Datos de pruebas desactivados
 
 
 if __name__ == "__main__":
