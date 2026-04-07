@@ -43,13 +43,15 @@ font_info   = pygame.font.SysFont("Arial", int(f_size * 0.60), bold=True)
 font_button = pygame.font.SysFont("Arial", int(f_size * 0.82), bold=True)
 
 # -------- SONIDOS --------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 try:
-    success_sound = pygame.mixer.Sound("success.wav.mp3")
+    success_sound = pygame.mixer.Sound(os.path.join(BASE_DIR, "docs", "success.wav.mp3"))
 except Exception:
     success_sound = None
 
 try:
-    fail_sound = pygame.mixer.Sound("error.wav.mp3")
+    fail_sound = pygame.mixer.Sound(os.path.join(BASE_DIR, "docs", "error.wav.mp3"))
 except Exception:
     fail_sound = None
 
@@ -440,7 +442,9 @@ def draw_summary(results):
 
 # -------- JSON --------
 def save_results_json(results, patient_name):
-    folder = "resultados"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    folder = os.path.join(BASE_DIR, "resultados")
+    
     if not os.path.exists(folder):
         os.makedirs(folder)
 

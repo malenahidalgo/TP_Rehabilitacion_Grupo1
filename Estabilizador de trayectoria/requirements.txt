@@ -1,0 +1,4 @@
+# Dependencias principales para el Test Estabilizador de trayectoria
+pygame==2.5.2
+# Las siguientes librerías son estándar de Python y no requieren instalación externa:
+# time, math, json, os, re, random

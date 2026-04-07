@@ -1,0 +1,45 @@
+{
+    "paciente": "m",
+    "fecha": "2026-04-07T19:23:06.357654",
+    "tipo_test": "Control de Trayectoria",
+    "resultados": [
+        {
+            "level": 1,
+            "errors": 3,
+            "time": 2.41,
+            "reaction_time": 0.02,
+            "errors_per_min": 74.73
+        },
+        {
+            "level": 2,
+            "errors": 4,
+            "time": 0.97,
+            "reaction_time": 0.02,
+            "errors_per_min": 247.78
+        },
+        {
+            "level": 3,
+            "errors": 6,
+            "time": 1.23,
+            "reaction_time": 0.02,
+            "errors_per_min": 291.92
+        }
+    ],
+    "resumen": {
+        "niveles_completados": 3,
+        "errores_totales": 13,
+        "tiempo_total_s": 4.61,
+        "tiempo_reaccion_s": [
+            0.02,
+            0.02,
+            0.02
+        ],
+        "errores_por_minuto": [
+            74.73,
+            247.78,
+            291.92
+        ],
+        "tendencia_fatiga": "fatiga",
+        "ipt_global": 0
+    }
+}
