@@ -41,3 +41,25 @@ Barra de progreso por nivel
 Transición entre niveles
 Feedback motivacional para el paciente
 Posibilidad de salida en cualquier momento (ESC)
+
+🛠️ Instalación y Requisitos
+Requisitos:
+Python 3.x
+pip
+Librerías necesarias:
+pip install pygame numpy
+🎮 Cómo usarlo
+
+Ejecutar el archivo principal:
+
+python fitts.py
+Flujo del test:
+Ingresar ID del paciente
+Leer las instrucciones iniciales
+El paciente deberá:
+Hacer click sobre los círculos
+Intentar ser lo más rápido y preciso posible
+Completar los 3 niveles de dificultad
+Finalización
+Se muestra un resumen simple para el paciente
+Se genera automáticamente un archivo JSON en la carpeta /results
