@@ -29,40 +29,41 @@ Sistema de estrellas:
 
 Generación automática de reportes en formato JSON con:
 
-Puntaje total
-Cantidad de intentos
-Precisión (% de aciertos)
-Tiempo de movimiento medio (MT)
-Error medio
-Pendiente de Fitts (b)
-Throughput (TP) → eficiencia motora
+- Puntaje total
+- Cantidad de intentos
+- Precisión (% de aciertos)
+- Tiempo de movimiento medio (MT)
+- Error medio
+- Pendiente de Fitts (b)
+- Throughput (TP) → eficiencia motora
+  
 📈 Experiencia del Usuario
-Pantalla de instrucciones inicial
-Barra de progreso por nivel
-Transición entre niveles
-Feedback motivacional para el paciente
-Posibilidad de salida en cualquier momento (ESC)
+- Pantalla de instrucciones inicial
+- Barra de progreso por nivel
+- Transición entre niveles
+- Feedback motivacional para el paciente
+- Posibilidad de salida en cualquier momento (ESC)
 
-#🛠️ Instalación y Requisitos
+*🛠️ Instalación y Requisitos*
 Requisitos:
-Python 3.x
-pip
+- Python 3.x
+- pip
 Librerías necesarias:
-pip install pygame numpy
+*pip install pygame numpy*
 
-#🎮 Cómo usarlo
+*🎮 Cómo usarlo*
 
 Ejecutar el archivo principal:
 
 python fitts.py
 Flujo del test:
-Ingresar ID del paciente
-Leer las instrucciones iniciales
-El paciente deberá:
-Hacer click sobre los círculos
-Intentar ser lo más rápido y preciso posible
-Completar los 3 niveles de dificultad
-Finalización
+1. Ingresar ID del paciente
+2. Leer las instrucciones iniciales
+3. El paciente deberá:
+    Hacer click sobre los círculos
+    Intentar ser lo más rápido y preciso posible
+4. Completar los 3 niveles de dificultad
+6. Finalización
 Se muestra un resumen simple para el paciente
 Se genera automáticamente un archivo JSON en la carpeta /results
 
