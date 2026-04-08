@@ -1,10 +1,11 @@
-#🎯 Test de Control Motor basado en la Ley de Fitts 🧠
+*🎯 Test de Control Motor basado en la Ley de Fitts 🧠*
 
 Este software es una herramienta de Ingeniería de la Rehabilitación desarrollada en Python para evaluar el control motor del miembro superior en pacientes con hemiparesia post-ACV, mediante tareas de selección de objetivos en pantalla.
 
 El sistema se basa en la Ley de Fitts, permitiendo analizar la relación entre velocidad y precisión del movimiento a través de métricas cuantitativas.
 
-🚀 Funcionalidades
+*🚀 Funcionalidades*
+
 🎮 Evaluación de Control Motor
 Tres niveles de dificultad progresiva
 Targets con:
