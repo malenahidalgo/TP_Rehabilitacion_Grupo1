@@ -23,7 +23,7 @@ Este software es una herramienta de **Ingeniería de la Rehabilitación** desarr
 ## 🎮 Cómo usarlo
 1. Ejecuta el archivo principal:
     ```bash
-    python ReaccionMultimodal.py
+    python main.py
 
 2. Ingresa el nombre del paciente en el menú inicial.
 
