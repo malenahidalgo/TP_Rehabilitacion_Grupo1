@@ -7,28 +7,22 @@ El sistema se basa en la Ley de Fitts, permitiendo analizar la relación entre v
 *🚀 Funcionalidades*
 
 🎮 Evaluación de Control Motor
-Tres niveles de dificultad progresiva
-Targets con:
-Movimiento lineal alternado (izquierda ↔ derecha)
-Distribución aleatoria (nivel avanzado)
-Variación de:
-Distancia (D)
-Tamaño del target (W)
+Se cuenta con tres niveles de dificultad progresiva con targets con movimiento lineal alternado (izquierda ↔ derecha), y un cuarto nivel con distribución aleatoria.
+Los targets tienen variación de Distancia (D) y Tamaño del target (W)
+
 🔊 Feedback Multimodal
 Retroalimentación visual:
-Verde (acierto)
-Rojo (error)
+- Verde (acierto)
+- Rojo (error)
 Feedback auditivo:
-Sonido de éxito (dependiente de desempeño)
-Sonido de error
+- Sonido de éxito (dependiente de desempeño)
+- Sonido de error
 Sistema de estrellas:
-⭐ (bien)
-⭐⭐ (muy bien)
-⭐⭐⭐ (excelente)
-📊 Análisis Clínico
+- ⭐ (bien)
+- ⭐⭐ (muy bien)
+- ⭐⭐⭐ (excelente)
 
-Generación automática de reportes en formato JSON con:
-
+📊Generación automática de reportes en formato JSON con:
 - Puntaje total
 - Cantidad de intentos
 - Precisión (% de aciertos)
@@ -36,7 +30,7 @@ Generación automática de reportes en formato JSON con:
 - Error medio
 - Pendiente de Fitts (b)
 - Throughput (TP) → eficiencia motora
-  
+
 📈 Experiencia del Usuario
 - Pantalla de instrucciones inicial
 - Barra de progreso por nivel
@@ -52,10 +46,9 @@ Librerías necesarias:
 *pip install pygame numpy*
 
 *🎮 Cómo usarlo*
-
 Ejecutar el archivo principal:
-
 python fitts.py
+
 Flujo del test:
 1. Ingresar ID del paciente
 2. Leer las instrucciones iniciales
