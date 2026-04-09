@@ -36,7 +36,7 @@ Sistema de estrellas:
 - Barra de progreso por nivel
 - Transición entre niveles
 - Feedback motivacional para el paciente
-- Posibilidad de salida en cualquier momento (ESC)
+- Posibilidad de salida en cualquier momento (ESC) --> Para salir del juego y que se guarden los resultados se debe salir con esta opción, no cerrando la pantalla con la cruz.
 
 *🛠️ Instalación y Requisitos*
 Requisitos:
